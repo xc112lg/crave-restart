@@ -50,6 +50,6 @@ jobs:
                else 
                  tmux kill-session -t codeserver
                  tmux new-session -d -s codeserver
-                 tmux send-keys -t codeserver 'codeserver' Enter 
+                 tmux send-keys -t codeserver 'code-server' Enter 
                  echo "Runner Started"
                fi "
