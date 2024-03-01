@@ -39,7 +39,7 @@ jobs:
 
       - name: Reset crave devspace by Changing Service Link to VNC port 5900
         run: |
-               crave devspace --link-service VNC:5900:5900
+               crave devspace --link-service VNC:5900:5900 -- "jq '.projects = []' ~/crave.conf > tmp && mv tmp ~/crave.conf"
                
       - name: Change Service Link to VSCODE port 8080 for code-server
         run: |
