@@ -1,0 +1,53 @@
+name: Restart-Crave
+on:
+  workflow_dispatch:
+jobs:
+  start:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Cleanup 
+      - name: Cleanup Step
+        run: rm -rf *
+      # Check-out in order to access the repository's files.
+      - name: Check-out to repository
+        uses: actions/checkout@v4
+      # Set-up a spearate directory for the device.
+      - name: Set-up workspace environment
+        run: |
+          mkdir workspace
+          cd workspace
+        continue-on-error: true      
+      - name: Configure the 'crave' environment
+        run: |
+            if [ "${DCDEVSPACE}" == "1" ]; then
+              echo 'No need to set up crave, we are already running in devspace!'
+            else
+              curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
+              mkdir ${HOME}/bin/
+              mv ${PWD}/crave ${HOME}/bin/
+              sudo ln -sf /home/${USER}/bin/crave /usr/bin/crave
+              mkdir ~/.ssh
+            fi
+      - name: Configure Crave Credentials
+        run: | 
+              envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
+              rm -rf ${PWD}/crave.conf.sample
+        env:
+             CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
+             CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}        
+
+      - name: Reset crave devspace by Changing Service Link to VNC port 5900
+        run: |
+               crave devspace --link-service VNC:5900:5900
+               
+      - name: Change Service Link to VSCODE port 8080 for code-server
+        run: |
+               crave devspace --link-service vscode:8080:8080 -- "if tmux has-session -t codeserver; then 
+                 echo "Runner is already Running" 
+               else 
+                 tmux kill-session -t codeserver
+                 tmux new-session -d -s codeserver
+                 tmux send-keys -t codeserver 'codeserver' Enter 
+                 echo "Runner Started"
+               fi "
