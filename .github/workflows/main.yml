@@ -41,7 +41,7 @@ jobs:
         run: |
                # hostnamectl set-hostname ${{ github.actor }}
                crave devspace --link-service VNC:5900:5900 -- "jq '.projects = []' ~/crave.conf > tmp && mv tmp ~/crave.conf
-               rm -r /crave-devspaces/.repo"
+               rm -r /crave-devspaces/.repo;"
                
       - name: Change Service Link to VSCODE port 8080 for code-server
         run: |
