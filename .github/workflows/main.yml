@@ -38,6 +38,7 @@ jobs:
              CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}        
 
       - name: Reset crave devspace by Changing Service Link to VNC port 5900
+        continue-on-error: true
         run: |
                # hostnamectl set-hostname ${{ github.actor }}
                crave devspace --link-service VNC:5900:5900 -- "jq '.projects = []' ~/crave.conf > tmp && mv tmp ~/crave.conf
